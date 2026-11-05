@@ -1,0 +1,12 @@
+__pycache__
+_trial_temp
+*.egg-info
+.eggs
+venv
+dist
+.coverage
+base.lcov
+head.lcov
+.superpowers/
+.duvet/reports/
+.duvet/requirements/
