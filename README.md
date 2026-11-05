@@ -46,23 +46,11 @@ modules:
 
 | Key | Default | Meaning |
 | --- | --- | --- |
-| `allow` | see below | Map from action to the list of user types allowed to perform it. Only the actions you name are replaced; the others keep their defaults. An action missing from the effective map is forbidden for everyone. |
+| `allow` | see the example | Map from action to the list of user types allowed to perform it. Only the actions you name are replaced; the others keep their defaults. An action missing from the effective map is forbidden for everyone. |
 | `always_allowed_state_events` | `[]` | State event types that `send_state_event` always permits. |
 | `alias_pattern` | `null` | Regular expression that room aliases must match, matched from the start of the alias (`re.match`; applies when `create_room_alias` is allowed); `null` means no restriction. |
 | `max_default_members_per_room` | `1` | Maximum number of non-bot users per room (integer >= 1). Every user of any type except `bot` (including `support` and unknown users) who was ever invited or a member counts, also if they left or were banned. Bots are not counted and are never blocked by the cap. Every `m.room.third_party_invite` (invitation by email or phone) counts as one non-bot user, also after it was redeemed. |
 | `allow_federated_invites` | `false` | Whether users of other homeservers may invite local users. By default every invitation arriving over federation is rejected. |
-
-Default `allow`:
-
-| Action | Allowed user types |
-| --- | --- |
-| `create_room` | `bot` |
-| `invite` | `bot` |
-| `invite_3pid` | none |
-| `send_state_event` | `bot` |
-| `join_uninvited_room` | `bot` |
-| `create_room_alias` | none |
-| `publish_room` | none |
 
 User type `default` stands for accounts without `user_type`. Unknown actions, unknown keys or values of the wrong type prevent Synapse from starting. Rejected actions answer with 403 `M_FORBIDDEN`; if the user type cannot be determined the action is rejected.
 
