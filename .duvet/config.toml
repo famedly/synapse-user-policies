@@ -1,0 +1,26 @@
+'$schema' = "https://awslabs.github.io/duvet/config/v0.4.0.json"
+
+# One pattern per directory so annotations are not counted twice.
+[[source]]
+pattern = "synapse_user_policies/**/*.py"
+comment-style = { meta = "##=", content = "##" }
+
+[[source]]
+pattern = "tests/**/*.py"
+comment-style = { meta = "##=", content = "##" }
+
+[[source]]
+pattern = "complement/**/*.go"
+
+[[specification]]
+source = "docs/requirements/user-policies.md"
+format = "markdown"
+
+[report.html]
+enabled = true
+
+[report.json]
+enabled = true
+
+[report.snapshot]
+enabled = true

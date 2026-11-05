@@ -1,0 +1,145 @@
+SPECIFICATION: [Synapse module synapse-user-policies](docs/requirements/user-policies.md)
+  SECTION: [FM-POL-1](#fm-pol-1)
+    TEXT[!MUST,implementation,test]: The module MUST determine a user's rights exclusively from the Synapse field user_type of their account.
+    TEXT[!MUST,implementation,test]: An account without user_type MUST count as type default.
+
+  SECTION: [FM-POL-2](#fm-pol-2)
+    TEXT[!MUST,implementation,test]: An action MUST be allowed only for the user types listed for this action in the configuration allow.
+    TEXT[!MUST,implementation,test]: If an action is missing from allow, it MUST be forbidden for all user types.
+    TEXT[!MUST,implementation,test]: If the module cannot determine the user type of an account, it MUST reject the action.
+    TEXT[!MUST,implementation,test]: If the module rejects an action, Synapse MUST respond with 403 and the error code M_FORBIDDEN.
+
+  SECTION: [AK-FM-POL-2.1](#ak-fm-pol-2-1)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403 and M_FORBIDDEN
+    TEXT[!MUST,test]: AND no room MUST be created
+
+  SECTION: [AK-FM-POL-2.2](#ak-fm-pol-2-2)
+    TEXT[!MUST,test]: THEN the room MUST be created
+
+  SECTION: [FM-POL-3](#fm-pol-3)
+    TEXT[!MUST,implementation,test]: The module MUST check the action create_room when a room is created and when a room is upgraded.
+    TEXT[!MUST,implementation,test]: The module MUST check the action invite on every local invitation, including invitations in the invite field of createRoom and via the state endpoint with m.room.member.
+    TEXT[!MUST,implementation,test]: The module MUST check the action invite_3pid on invitations by email address or phone number.
+    TEXT[!MUST,implementation,test]: The module MUST check the action create_room_alias when an alias is created, including via room_alias_name in createRoom.
+    TEXT[!MUST,implementation,test]: The module MUST check the action publish_room when a room is published in the room directory.
+    TEXT[!MUST,implementation,test]: The module MUST check the action send_state_event on every PUT to a room's state endpoint.
+    TEXT[!MUST,implementation,test]: The module MUST check the action join_uninvited_room on every join to a room the user has not been invited to.
+
+  SECTION: [AK-FM-POL-3.1](#ak-fm-pol-3-1)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND the invited user MUST NOT receive an invitation
+
+  SECTION: [AK-FM-POL-3.2](#ak-fm-pol-3-2)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND the other user MUST NOT receive an invitation
+
+  SECTION: [AK-FM-POL-3.3](#ak-fm-pol-3-3)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+
+  SECTION: [AK-FM-POL-3.4](#ak-fm-pol-3-4)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND no new room MUST be created
+
+  SECTION: [AK-FM-POL-3.5](#ak-fm-pol-3-5)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+
+  SECTION: [AK-FM-POL-3.6](#ak-fm-pol-3-6)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND m.room.power_levels MUST remain unchanged
+
+  SECTION: [AK-FM-POL-3.7](#ak-fm-pol-3-7)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+
+  SECTION: [FM-POL-4](#fm-pol-4)
+    TEXT[!MUST,implementation,test]: The module MUST NOT restrict login, logout, changing display name and avatar, accepting an invitation, reading and sending messages, or exchanging E2EE keys.
+
+  SECTION: [AK-FM-POL-4.1](#ak-fm-pol-4-1)
+    TEXT[!MUST,test]: THEN the user MUST be a member of the room
+    TEXT[!MUST,test]: AND the message MUST be in the room
+
+  SECTION: [AK-FM-POL-4.2](#ak-fm-pol-4-2)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 200 in each case
+
+  SECTION: [FM-POL-5](#fm-pol-5)
+    TEXT[!MUST,implementation,test]: Unless configured otherwise, allow MUST permit the actions create_room, invite, send_state_event and join_uninvited_room only for type bot.
+    TEXT[!MUST,implementation,test]: Unless configured otherwise, allow MUST permit the actions invite_3pid, create_room_alias and publish_room for no user type.
+
+  SECTION: [AK-FM-POL-5.1](#ak-fm-pol-5-1)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND the alias MUST NOT exist
+
+  SECTION: [FM-POL-6](#fm-pol-6)
+    TEXT[!MUST,implementation,test]: If the configuration contains an unknown action, an unknown key or a value of the wrong type, Synapse MUST NOT start.
+
+  SECTION: [FM-POL-7](#fm-pol-7)
+    TEXT[!MUST,implementation,test]: The module MUST reject every invitation from another homeserver unless allow_federated_invites is true.
+    TEXT[!MUST,implementation,test]: Unless configured otherwise, allow_federated_invites MUST be false.
+
+  SECTION: [AK-FM-POL-7.1](#ak-fm-pol-7-1)
+    TEXT[!MUST,test]: THEN the invitation MUST fail
+    TEXT[!MUST,test]: AND the invited user MUST NOT receive an invitation
+
+  SECTION: [FM-POL-10](#fm-pol-10)
+    TEXT[!MUST,implementation,test]: The guardrails MUST apply to users of every type, including bot.
+    TEXT[!MUST,implementation,test]: The join rule of a room MUST always be invite.
+    TEXT[!MUST,implementation,test]: The history visibility of a room MUST NOT be world_readable.
+    TEXT[!MUST,implementation,test]: The guest access of a room MUST NOT be can_join.
+    TEXT[!MUST,implementation,test]: Every room MUST be encrypted from its creation.
+    TEXT[!MUST,implementation,test]: The encryption algorithm of a room MUST be m.megolm.v1.aes-sha2.
+    TEXT[!MUST,implementation,test]: The module MUST reject every room creation and every event that would violate one of these conditions.
+
+  SECTION: [AK-FM-POL-10.1](#ak-fm-pol-10-1)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND no room MUST be created
+
+  SECTION: [AK-FM-POL-10.2](#ak-fm-pol-10-2)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND no room MUST be created
+
+  SECTION: [AK-FM-POL-10.3](#ak-fm-pol-10-3)
+    TEXT[!MUST,test]: THEN Synapse MUST reject the event
+    TEXT[!MUST,test]: AND the room's setting MUST remain unchanged
+
+  SECTION: [AK-FM-POL-10.4](#ak-fm-pol-10-4)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND no room MUST be created
+
+  SECTION: [AK-FM-POL-10.5](#ak-fm-pol-10-5)
+    TEXT[!MUST,test]: THEN Synapse MUST reject the event
+    TEXT[!MUST,test]: AND the room's encryption algorithm MUST remain m.megolm.v1.aes-sha2
+
+  SECTION: [FM-POL-11](#fm-pol-11)
+    TEXT[!MUST,implementation,test]: The module MUST ensure that in a room at most as many users who are not of type bot have ever been invited or been members as max_default_members_per_room specifies.
+    TEXT[!MUST,implementation,test]: Unless configured otherwise, max_default_members_per_room MUST equal 1.
+    TEXT[!MUST,implementation,test]: Multiple users of type bot MUST be allowed in a room.
+    TEXT[!MUST,implementation,test]: The limit MUST also apply to invitations by email address or phone number, whose invitee counts as a user who is not of type bot.
+    TEXT[!MUST,implementation,test]: Every m.room.third_party_invite in the room MUST count as one user who is not of type bot, also after it has been redeemed.
+
+  SECTION: [AK-FM-POL-11.1](#ak-fm-pol-11-1)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND the second user MUST NOT receive an invitation
+
+  SECTION: [AK-FM-POL-11.2](#ak-fm-pol-11-2)
+    TEXT[!MUST,test]: THEN the second bot MUST receive the invitation
+
+  SECTION: [AK-FM-POL-11.3](#ak-fm-pol-11-3)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403
+    TEXT[!MUST,test]: AND the other user MUST NOT receive an invitation
+
+  SECTION: [AK-FM-POL-11.4](#ak-fm-pol-11-4)
+    TEXT[!MUST,test]: THEN Synapse MUST respond with 403 and M_FORBIDDEN
+
+  SECTION: [FM-POL-30](#fm-pol-30)
+    TEXT[!MUST,implementation]: The module MUST provide the OIDC user mapping provider synapse_user_policies.RandomLocalpartMapping.
+    TEXT[!MUST,implementation,test]: The mapping provider MUST use the claim sub of the identity provider as the remote user ID.
+    TEXT[!MUST,implementation,test]: For a new account, the mapping provider MUST return a localpart that is the lower-case text form of a random UUIDv4.
+    TEXT[!MUST,implementation,test]: The mapping provider MUST NOT let the user confirm or choose the localpart.
+    TEXT[!MUST,implementation,test]: The mapping provider MUST NOT take over a display name, an avatar or email addresses from the identity provider.
+
+  SECTION: [FM-POL-31](#fm-pol-31)
+    TEXT[!MUST,implementation,test]: When an account of the homeserver is deactivated with erase, the module MUST delete all media the account uploaded.
+    TEXT[!MUST,implementation,test]: When an account of the homeserver is deactivated with erase, the module MUST remove the account's external IDs.
+    TEXT[!MUST,implementation,test]: This MUST apply to deactivation by a server admin and by the user.
+
+  SECTION: [FM-POL-20](#fm-pol-20)
+    TEXT[!MUST,implementation,test]: At runtime, the module MUST NOT need Python packages other than Synapse and the standard library.
