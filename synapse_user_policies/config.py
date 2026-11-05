@@ -4,16 +4,6 @@ from dataclasses import dataclass
 
 from synapse.module_api.errors import ConfigError
 
-ACTIONS = (
-    "create_room",
-    "invite",
-    "invite_3pid",
-    "create_room_alias",
-    "publish_room",
-    "send_state_event",
-    "join_uninvited_room",
-)
-
 ##= docs/requirements/user-policies.md#fm-pol-5
 ## Unless configured otherwise, allow MUST permit the actions create_room, invite, send_state_event and join_uninvited_room only for type bot.
 ##= docs/requirements/user-policies.md#fm-pol-5
@@ -63,7 +53,7 @@ def parse_config(raw: dict) -> Config:
     user_allow = raw.get("allow", {})
     if not isinstance(user_allow, dict):
         raise ConfigError("allow must be a mapping")
-    if unknown := set(user_allow) - set(ACTIONS):
+    if unknown := set(user_allow) - _DEFAULT_ALLOW.keys():
         raise ConfigError(f"unknown actions in allow: {sorted(unknown)}")
     # A supplied entry replaces only the action it names.
     allow = {a: frozenset(d) for a, d in _DEFAULT_ALLOW.items()}
