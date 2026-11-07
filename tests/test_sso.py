@@ -129,23 +129,26 @@ class MediaPurgeTest(unittest.TestCase):
 
 class NoLocalpartDisplayNameTest(unittest.TestCase):
     def run_registration(self, user_id, displayname):
-        mod, _, store = make_policies()
-        store.get_profile_displayname = AsyncMock(return_value=displayname)
-        store.set_profile_displayname = AsyncMock()
+        mod, _, _ = make_policies()
+        api = mod._api
+        api.get_profile_for_user = AsyncMock(
+            return_value=Mock(display_name=displayname)
+        )
+        api.set_displayname = AsyncMock()
         asyncio.run(mod.on_user_registration(user_id))
-        return store
+        return api
 
     ##= docs/requirements/user-policies.md#fm-pol-30
     ##= type=test
     ## When an account is created whose display name equals its localpart, the module MUST remove the display name.
     def test_localpart_as_display_name_is_removed(self):
         uid = "@0f5e-uuid:example.org"
-        store = self.run_registration(uid, "0f5e-uuid")
-        store.set_profile_displayname.assert_awaited_once_with(
-            UserID.from_string(uid), None
-        )
+        api = self.run_registration(uid, "0f5e-uuid")
+        api.get_profile_for_user.assert_awaited_once_with("0f5e-uuid")
+        # Synapse's profile handler stores an empty display name as none.
+        api.set_displayname.assert_awaited_once_with(UserID.from_string(uid), "")
 
     def test_real_name_stays(self):
         for name in ("Ann", None, ""):
-            store = self.run_registration("@0f5e-uuid:example.org", name)
-            store.set_profile_displayname.assert_not_awaited()
+            api = self.run_registration("@0f5e-uuid:example.org", name)
+            api.set_displayname.assert_not_awaited()

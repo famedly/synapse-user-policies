@@ -223,9 +223,9 @@ class UserPolicies:
     ## When an account is created whose display name equals its localpart, the module MUST remove the display name.
     async def on_user_registration(self, user_id: str) -> None:
         # Synapse falls back to the localpart when the identity provider gives no name (Apple);
-        # without it, clients and the operator see that no name is set. The module API has no
-        # profile setter that takes None, so this uses Synapse's store.
-        store = self._api._hs.get_datastores().main
+        # without it, clients and the operator see that no name is set. Public module API only:
+        # Synapse's profile handler stores an empty display name as none.
         user = UserID.from_string(user_id)
-        if await store.get_profile_displayname(user) == user.localpart:
-            await store.set_profile_displayname(user, None)
+        profile = await self._api.get_profile_for_user(user.localpart)
+        if profile.display_name == user.localpart:
+            await self._api.set_displayname(user, "")
