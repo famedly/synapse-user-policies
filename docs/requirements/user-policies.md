@@ -386,7 +386,9 @@ For a new account, the mapping provider MUST take over the claim name of the ide
 
 The mapping provider MUST NOT take over an avatar or email addresses from the identity provider.
 
-Note: Synapse finds an existing account by identity provider and remote user ID and calls the mapping provider only for new accounts. A localpart from an email address or a name could be guessed. The name is taken over at the first sign-in only; Synapse does not update them later unless its sso.update_profile_information is on.
+When an account is created whose display name equals its localpart, the module MUST remove the display name.
+
+Note: Synapse finds an existing account by identity provider and remote user ID and calls the mapping provider only for new accounts. A localpart from an email address or a name could be guessed. Synapse gives a new account its localpart as display name when the provider has no name (Apple); the module removes it, so clients and the operator see that no name is set. The name is taken over at the first sign-in only; Synapse does not update them later unless its sso.update_profile_information is on.
 
 ### FM-POL-31
 

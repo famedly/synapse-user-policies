@@ -2,7 +2,7 @@ from typing import Literal
 
 from synapse.module_api import NOT_SPAM, ModuleApi
 from synapse.module_api.errors import Codes, SynapseError
-from synapse.types import JsonDict, RoomAlias
+from synapse.types import JsonDict, RoomAlias, UserID
 
 from synapse_user_policies import config as cfg
 from synapse_user_policies.guardrails import check_create_room, state_event_violation
@@ -33,6 +33,11 @@ class UserPolicies:
             check_event_allowed=self.check_event_allowed,
             on_create_room=self.on_create_room,
             on_user_deactivation_status_changed=self.on_user_deactivation_status_changed,
+        )
+        # Only the registration hook of the account validity callbacks; account validity itself
+        # stays off.
+        api.register_account_validity_callbacks(
+            on_user_registration=self.on_user_registration
         )
 
     ##= docs/requirements/user-policies.md#fm-pol-10
@@ -213,3 +218,14 @@ class UserPolicies:
                 break
         if media_ids:
             await hs.get_media_repository().delete_local_media_ids(media_ids)
+
+    ##= docs/requirements/user-policies.md#fm-pol-30
+    ## When an account is created whose display name equals its localpart, the module MUST remove the display name.
+    async def on_user_registration(self, user_id: str) -> None:
+        # Synapse falls back to the localpart when the identity provider gives no name (Apple);
+        # without it, clients and the operator see that no name is set. The module API has no
+        # profile setter that takes None, so this uses Synapse's store.
+        store = self._api._hs.get_datastores().main
+        user = UserID.from_string(user_id)
+        if await store.get_profile_displayname(user) == user.localpart:
+            await store.set_profile_displayname(user, None)
