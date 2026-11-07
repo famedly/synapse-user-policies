@@ -1,5 +1,5 @@
-"""Accounts created by Synapse's own SSO (`oidc_providers`): random localparts; the name and
-the name of the identity provider at the first sign-in, nothing else."""
+"""Accounts created by Synapse's own SSO (`oidc_providers`): random localparts, and the name of
+the identity provider at the first sign-in, nothing else."""
 
 import uuid
 from typing import Any
