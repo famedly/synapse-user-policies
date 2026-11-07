@@ -134,7 +134,9 @@ SPECIFICATION: [Synapse module synapse-user-policies](docs/requirements/user-pol
     TEXT[!MUST,implementation,test]: The mapping provider MUST use the claim sub of the identity provider as the remote user ID.
     TEXT[!MUST,implementation,test]: For a new account, the mapping provider MUST return a localpart that is the lower-case text form of a random UUIDv4.
     TEXT[!MUST,implementation,test]: The mapping provider MUST NOT let the user confirm or choose the localpart.
-    TEXT[!MUST,implementation,test]: The mapping provider MUST NOT take over a display name, an avatar or email addresses from the identity provider.
+    TEXT[!MUST,implementation,test]: For a new account, the mapping provider MUST take over the claim name of the identity provider as the display name, if it is present.
+    TEXT[!MUST,implementation,test]: For a new account, the mapping provider MUST take over the claim email as the email address only if the claim email_verified is true.
+    TEXT[!MUST,implementation,test]: The mapping provider MUST NOT take over an avatar from the identity provider.
 
   SECTION: [FM-POL-31](#fm-pol-31)
     TEXT[!MUST,implementation,test]: When an account of the homeserver is deactivated with erase, the module MUST delete all media the account uploaded.

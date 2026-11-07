@@ -382,9 +382,13 @@ For a new account, the mapping provider MUST return a localpart that is the lowe
 
 The mapping provider MUST NOT let the user confirm or choose the localpart.
 
-The mapping provider MUST NOT take over a display name, an avatar or email addresses from the identity provider.
+For a new account, the mapping provider MUST take over the claim name of the identity provider as the display name, if it is present.
 
-Note: Synapse finds an existing account by identity provider and remote user ID and calls the mapping provider only for new accounts. A localpart from an email address or a name could be guessed.
+For a new account, the mapping provider MUST take over the claim email as the email address only if the claim email_verified is true.
+
+The mapping provider MUST NOT take over an avatar from the identity provider.
+
+Note: Synapse finds an existing account by identity provider and remote user ID and calls the mapping provider only for new accounts. A localpart from an email address or a name could be guessed. Name and email address are taken over at the first sign-in only; Synapse does not update them later unless its sso.update_profile_information is on.
 
 ### FM-POL-31
 

@@ -1,5 +1,5 @@
-"""Accounts created by Synapse's own SSO (`oidc_providers`): random localparts, nothing taken
-over from the identity provider."""
+"""Accounts created by Synapse's own SSO (`oidc_providers`): random localparts; the name and
+the verified email address of the identity provider at the first sign-in."""
 
 import uuid
 from typing import Any
@@ -31,13 +31,21 @@ class RandomLocalpartMapping:
         ##= docs/requirements/user-policies.md#fm-pol-30
         ## The mapping provider MUST NOT let the user confirm or choose the localpart.
         ##= docs/requirements/user-policies.md#fm-pol-30
-        ## The mapping provider MUST NOT take over a display name, an avatar or email addresses from the identity provider.
+        ## For a new account, the mapping provider MUST take over the claim name of the identity provider as the display name, if it is present.
+        name = str(userinfo.get("name") or "").strip() or None
+        ##= docs/requirements/user-policies.md#fm-pol-30
+        ## For a new account, the mapping provider MUST take over the claim email as the email address only if the claim email_verified is true.
+        # Google sends email_verified as a boolean, Apple as the string "true".
+        verified = str(userinfo.get("email_verified")).lower() == "true"
+        email = str(userinfo.get("email") or "").strip()
+        ##= docs/requirements/user-policies.md#fm-pol-30
+        ## The mapping provider MUST NOT take over an avatar from the identity provider.
         return {
             "localpart": str(uuid.uuid4()),
             "confirm_localpart": False,
-            "display_name": None,
+            "display_name": name,
             "picture": None,
-            "emails": [],
+            "emails": [email] if verified and email else [],
         }
 
     async def get_extra_attributes(self, userinfo: Any, token: Any) -> dict:
