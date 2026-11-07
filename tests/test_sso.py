@@ -34,11 +34,8 @@ class RandomLocalpartMappingTest(unittest.TestCase):
     ## For a new account, the mapping provider MUST take over the claim name of the identity provider as the display name, if it is present.
     ##= docs/requirements/user-policies.md#fm-pol-30
     ##= type=test
-    ## For a new account, the mapping provider MUST take over the claim email as the email address only if the claim email_verified is true.
-    ##= docs/requirements/user-policies.md#fm-pol-30
-    ##= type=test
-    ## The mapping provider MUST NOT take over an avatar from the identity provider.
-    def test_random_localpart_name_and_verified_email(self):
+    ## The mapping provider MUST NOT take over an avatar or email addresses from the identity provider.
+    def test_random_localpart_and_name_only(self):
         a = asyncio.run(self.provider.map_user_attributes(self.userinfo, {}, 0))
         b = asyncio.run(self.provider.map_user_attributes(self.userinfo, {}, 1))
         self.assertRegex(a["localpart"], UUID4)
@@ -49,29 +46,14 @@ class RandomLocalpartMappingTest(unittest.TestCase):
                 "confirm_localpart": False,
                 "display_name": "Ann",
                 "picture": None,
-                "emails": ["a@example.org"],
+                "emails": [],
             },
         )
 
-    def test_email_only_when_verified(self):
-        # Apple sends email_verified as the string "true"; Google as a boolean.
-        for verified, emails in (
-            (True, ["a@example.org"]),
-            ("true", ["a@example.org"]),
-            (False, []),
-            ("false", []),
-            (None, []),
-        ):
-            info = dict(self.userinfo, email_verified=verified)
-            if verified is None:
-                del info["email_verified"]
-            a = asyncio.run(self.provider.map_user_attributes(info, {}, 0))
-            self.assertEqual(a["emails"], emails, verified)
-
-    def test_no_name_or_email_claims(self):
-        # Apple's id_token has no name; without an email scope there is no email.
+    def test_no_name_claim(self):
+        # Apple's id_token has no name.
         a = asyncio.run(self.provider.map_user_attributes({"sub": "123"}, {}, 0))
-        self.assertEqual((a["display_name"], a["emails"]), (None, []))
+        self.assertIsNone(a["display_name"])
         a = asyncio.run(
             self.provider.map_user_attributes({"sub": "1", "name": "  "}, {}, 0)
         )
