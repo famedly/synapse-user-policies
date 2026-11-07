@@ -1,0 +1,6 @@
+modules:
+  - module: synapse_user_policies.UserPolicies
+    config:
+      # Opened for the bot so that AK-FM-POL-11.4 reaches the member cap.
+      allow:
+        invite_3pid: [bot]
