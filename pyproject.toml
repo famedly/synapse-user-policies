@@ -1,0 +1,39 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "synapse-user-policies"
+description = 'Synapse module which restricts which user types may perform which actions'
+readme = "README.md"
+requires-python = ">=3.10.0,<4.0.0"
+license = "AGPL-3.0-only"
+keywords = []
+authors = [
+  { name = "Sorunome", email = "mail@sorunome.de" },
+  { name = "Amanda Graven", email = "amanda@graven.dev" },
+  { name = "Jan Christian Grünhage", email = "jan.christian@gruenhage.xyz" },
+  { name = "Nicolas Werner", email = "n.werner@famedly.com" },
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+]
+dependencies = []
+version = "0.1.0"
+
+[project.urls]
+Documentation = "https://github.com/famedly/synapse-user-policies#synapse-user-policies"
+Issues = "https://github.com/famedly/synapse-user-policies/issues"
+Source = "https://github.com/famedly/synapse-user-policies/"
+
+[dependency-groups]
+dev = ["matrix-synapse==1.155.0"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["synapse_user_policies"]

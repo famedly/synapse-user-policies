@@ -1,0 +1,65 @@
+name: Python
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "*" ]
+  pull_request:
+    branches: [ "*" ]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+
+      - uses: actions/setup-python@c8813ba1bc76ebf779b911ad8ffccbf2e449cb48
+        with:
+          python-version: "3.12"
+
+      - run: pip install uv
+
+      - name: Formatting
+        uses: famedly/black@6af7d1109693c4ad3af08ecbc34649c232b47a6d
+        with:
+          options: "--check --verbose"
+
+      - name: Lint
+        uses: chartboost/ruff-action@1ec810db51b3ebdd902c812e962d2f7aafe85fcf
+        with:
+          args: check --target-version py312
+
+      - name: Tests
+        run: uv run --python 3.12 python -m unittest discover -s tests -v
+
+  duvet:
+    name: Requirement coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+
+      - name: Install duvet
+        uses: taiki-e/cache-cargo-install-action@3d5e3efe44b020826abe522d18cb4457042280ef
+        with:
+          tool: duvet@0.4.3
+
+      - name: Duvet report
+        run: duvet report --ci
+
+  complement:
+    name: Complement
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@900f2210b1d28bbbd0bd22d17926b9e224e8f231
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: complement/go.mod
+
+      - name: Complement
+        run: complement/run.sh
