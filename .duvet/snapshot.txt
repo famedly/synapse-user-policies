@@ -132,7 +132,7 @@ SPECIFICATION: [Synapse module synapse-user-policies](docs/requirements/user-pol
   SECTION: [FM-POL-30](#fm-pol-30)
     TEXT[!MUST,implementation]: The module MUST provide the OIDC user mapping provider synapse_user_policies.RandomLocalpartMapping.
     TEXT[!MUST,implementation,test]: The mapping provider MUST use the claim sub of the identity provider as the remote user ID.
-    TEXT[!MUST,implementation,test]: For a new account, the mapping provider MUST return a localpart that is the lower-case text form of a random UUIDv4.
+    TEXT[!MUST,implementation,test]: For a new account, the mapping provider MUST return a localpart of 8 characters, each chosen at random with a cryptographically secure generator from the alphabet 0123456789abcdefghjkmnpqrstvwxyz.
     TEXT[!MUST,implementation,test]: The mapping provider MUST NOT let the user confirm or choose the localpart.
     TEXT[!MUST,implementation,test]: For a new account, the mapping provider MUST take over the claim name of the identity provider as the display name, if it is present.
     TEXT[!MUST,implementation,test]: The mapping provider MUST NOT take over an avatar or email addresses from the identity provider.

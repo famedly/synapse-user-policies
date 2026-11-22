@@ -378,7 +378,7 @@ The module MUST provide the OIDC user mapping provider synapse_user_policies.Ran
 
 The mapping provider MUST use the claim sub of the identity provider as the remote user ID.
 
-For a new account, the mapping provider MUST return a localpart that is the lower-case text form of a random UUIDv4.
+For a new account, the mapping provider MUST return a localpart of 8 characters, each chosen at random with a cryptographically secure generator from the alphabet 0123456789abcdefghjkmnpqrstvwxyz.
 
 The mapping provider MUST NOT let the user confirm or choose the localpart.
 
@@ -388,7 +388,7 @@ The mapping provider MUST NOT take over an avatar or email addresses from the id
 
 When an account is created whose display name equals its localpart, the module MUST remove the display name.
 
-Note: Synapse finds an existing account by identity provider and remote user ID and calls the mapping provider only for new accounts. A localpart from an email address or a name could be guessed. Synapse gives a new account its localpart as display name when the provider has no name (Apple); the module removes it, so clients and the operator see that no name is set. The name is taken over at the first sign-in only; Synapse does not update them later unless its sso.update_profile_information is on.
+Note: Synapse finds an existing account by identity provider and remote user ID and calls the mapping provider only for new accounts. A localpart from an email address or a name could be guessed. The alphabet is Crockford Base32 in lower case (no i, l, o or u), so a localpart read out or typed is not misread; 8 characters give 40 bits, enough where only bots may invite (FM-POL-5) and the MXID only has to be hard to guess, and short enough for a small QR code. A localpart that is taken makes Synapse call the mapping provider again with failures increased, and every call draws anew. The localpart never contains a hyphen, so it never has the form of a bot localpart (bot- followed by a UUID). Synapse gives a new account its localpart as display name when the provider has no name (Apple); the module removes it, so clients and the operator see that no name is set. The name is taken over at the first sign-in only; Synapse does not update them later unless its sso.update_profile_information is on.
 
 ### FM-POL-31
 

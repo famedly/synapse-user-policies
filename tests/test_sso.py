@@ -7,9 +7,7 @@ from synapse.types import UserID
 
 from synapse_user_policies import RandomLocalpartMapping, UserPolicies
 
-UUID4 = re.compile(
-    r"^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$"
-)
+LOCALPART = re.compile(r"^[0-9abcdefghjkmnpqrstvwxyz]{8}$")
 
 
 class RandomLocalpartMappingTest(unittest.TestCase):
@@ -27,7 +25,7 @@ class RandomLocalpartMappingTest(unittest.TestCase):
 
     ##= docs/requirements/user-policies.md#fm-pol-30
     ##= type=test
-    ## For a new account, the mapping provider MUST return a localpart that is the lower-case text form of a random UUIDv4.
+    ## For a new account, the mapping provider MUST return a localpart of 8 characters, each chosen at random with a cryptographically secure generator from the alphabet 0123456789abcdefghjkmnpqrstvwxyz.
     ##= docs/requirements/user-policies.md#fm-pol-30
     ##= type=test
     ## The mapping provider MUST NOT let the user confirm or choose the localpart.
@@ -40,7 +38,8 @@ class RandomLocalpartMappingTest(unittest.TestCase):
     def test_random_localpart_and_name_only(self):
         a = asyncio.run(self.provider.map_user_attributes(self.userinfo, {}, 0))
         b = asyncio.run(self.provider.map_user_attributes(self.userinfo, {}, 1))
-        self.assertRegex(a["localpart"], UUID4)
+        self.assertRegex(a["localpart"], LOCALPART)
+        self.assertRegex(b["localpart"], LOCALPART)
         self.assertNotEqual(a["localpart"], b["localpart"])
         self.assertEqual(
             {k: v for k, v in a.items() if k != "localpart"},
