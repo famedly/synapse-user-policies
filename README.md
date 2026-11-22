@@ -56,7 +56,7 @@ User type `default` stands for accounts without `user_type`. Unknown actions, un
 
 ## Accounts from single sign-on
 
-For homeservers whose users sign in with Synapse's own SSO (`oidc_providers`), the package has an OIDC user mapping provider that gives every new account a random UUIDv4 localpart and takes over nothing else (no display name, avatar or email) from the identity provider, so nobody is asked to pick a username and no localpart can be guessed:
+For homeservers whose users sign in with Synapse's own SSO (`oidc_providers`), the package has an OIDC user mapping provider that gives every new account a random localpart of 8 characters (Crockford Base32 in lower case) and takes over nothing else (no display name, avatar or email) from the identity provider, so nobody is asked to pick a username and no localpart can be guessed:
 
 ```yaml
 oidc_providers:

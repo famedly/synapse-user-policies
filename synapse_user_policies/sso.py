@@ -1,8 +1,12 @@
 """Accounts created by Synapse's own SSO (`oidc_providers`): random localparts, and the name of
 the identity provider at the first sign-in, nothing else."""
 
-import uuid
+import secrets
 from typing import Any
+
+# Crockford Base32 in lower case: no i, l, o or u, so a localpart read out or typed is not misread.
+LOCALPART_ALPHABET = "0123456789abcdefghjkmnpqrstvwxyz"
+LOCALPART_LENGTH = 8
 
 
 ##= docs/requirements/user-policies.md#fm-pol-30
@@ -27,7 +31,7 @@ class RandomLocalpartMapping:
     ) -> dict:
         # Only called for a new account: Synapse finds known users by (idp_id, sub).
         ##= docs/requirements/user-policies.md#fm-pol-30
-        ## For a new account, the mapping provider MUST return a localpart that is the lower-case text form of a random UUIDv4.
+        ## For a new account, the mapping provider MUST return a localpart of 8 characters, each chosen at random with a cryptographically secure generator from the alphabet 0123456789abcdefghjkmnpqrstvwxyz.
         ##= docs/requirements/user-policies.md#fm-pol-30
         ## The mapping provider MUST NOT let the user confirm or choose the localpart.
         ##= docs/requirements/user-policies.md#fm-pol-30
@@ -36,7 +40,10 @@ class RandomLocalpartMapping:
         ##= docs/requirements/user-policies.md#fm-pol-30
         ## The mapping provider MUST NOT take over an avatar or email addresses from the identity provider.
         return {
-            "localpart": str(uuid.uuid4()),
+            # A taken localpart makes Synapse call again (failures + 1); every call draws anew.
+            "localpart": "".join(
+                secrets.choice(LOCALPART_ALPHABET) for _ in range(LOCALPART_LENGTH)
+            ),
             "confirm_localpart": False,
             "display_name": name,
             "picture": None,

@@ -10,6 +10,6 @@ All notable changes to this project will be documented in this file.
 - Room guardrails for all users: invite-only, no `world_readable`, no guest access, encrypted with `m.megolm.v1.aes-sha2` from creation
 - Member cap `max_default_members_per_room` (3PID invitations count), no federated invitations by default
 - Options `always_allowed_state_events`, `alias_pattern`
-- OIDC user mapping provider `RandomLocalpartMapping`: random UUIDv4 localparts, nothing taken over from the identity provider
+- OIDC user mapping provider `RandomLocalpartMapping`: random localparts of 8 characters (Crockford Base32 in lower case), nothing taken over from the identity provider
 - Erasure: media and external IDs of an account deactivated with `erase` are removed
 - Complement tests, Duvet requirement coverage
